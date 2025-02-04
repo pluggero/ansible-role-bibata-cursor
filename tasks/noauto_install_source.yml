@@ -1,0 +1,72 @@
+---
+- name: Ensure bibata cursor are installed
+  block:
+    - name: Check if installation directory exists
+      ansible.builtin.stat:
+        path: "{{ bibata_cursor_install_dir }}"
+      register: bibata_cursor_dir
+
+    - name: Check if selected bibata cursor is installed
+      ansible.builtin.find:
+        paths: "{{ bibata_cursor_install_dir }}"
+        patterns: "Bibata-Modern-{{ bibata_cursor_type }}"
+        file_type: directory
+      register: bibata_cursor_selected
+      become: true
+      when:
+        - bibata_cursor_dir.stat.exists
+
+    - name: Force install if no matches were found
+      ansible.builtin.set_fact:
+        bibata_cursor_force_install: true
+      when:
+        - bibata_cursor_selected.matched is defined
+        - bibata_cursor_selected.matched == 0
+
+    - name: Install bibata cursor from source
+      when: bibata_cursor_selected.matched is not defined or bibata_cursor_force_install
+      block:
+        - name: Ensure the installation folder exists
+          ansible.builtin.file:
+            path: "{{ bibata_cursor_install_dir }}"
+            state: directory
+            mode: "0755"
+            owner: root
+            group: root
+          become: true
+
+        - name: Download specific cursor files
+          ansible.builtin.get_url:
+            url: "https://github.com/ful1e5/Bibata_Cursor/releases/download/v{{ bibata_cursor_version }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
+            dest: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
+            mode: "0755"
+            owner: root
+            group: root
+
+        - name: Extract cursor files
+          ansible.builtin.unarchive:
+            src: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
+            dest: "{{ bibata_cursor_tmp_dir }}"
+            remote_src: true
+          become: true
+
+        - name: Copy folder to cursor folder
+          ansible.builtin.copy:
+            src: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}"
+            dest: "{{ bibata_cursor_install_dir }}"
+            mode: "0755"
+            owner: root
+            group: root
+            remote_src: true
+          become: true
+
+        - name: Remove temporary cursor folder
+          ansible.builtin.file:
+            path: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}"
+            state: absent
+          become: true
+
+        - name: Remove cursor archive
+          ansible.builtin.file:
+            path: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
+            state: absent

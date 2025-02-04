@@ -1,0 +1,6 @@
+---
+- name: Install bibata cursor
+  block:
+    - name: Install bibata cursor
+      ansible.builtin.include_tasks:
+        file: noauto_install_{{ bibata_cursor_install_method }}.yml

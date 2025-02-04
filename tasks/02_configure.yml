@@ -1,0 +1,10 @@
+---
+- name: Configure bibata cursor
+  block:
+    - name: Setup default configuration
+      ansible.builtin.include_tasks:
+        file: noauto_configure_default.yml
+
+    - name: Setup gtk configuration
+      ansible.builtin.include_tasks:
+        file: noauto_configure_gtk.yml

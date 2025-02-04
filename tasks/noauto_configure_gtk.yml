@@ -1,0 +1,52 @@
+---
+- name: Setup gtk configuration
+  block:
+    - name: Get the gtk version
+      ansible.builtin.command:
+        cmd: "gtk-launch --version"
+      register: gtk_version_cmd
+      changed_when: false
+
+    - name: Derive the gtk major version directory
+      ansible.builtin.set_fact:
+        gtk_major_dir: "gtk-{{ (gtk_version_cmd.stdout | regex_search('^(\\d+)')) }}.0"
+
+    - name: Debug gtk major directory
+      ansible.builtin.debug:
+        var: gtk_major_dir
+
+    - name: Check if a user-specific gtk configuration file exists
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.config/{{ gtk_major_dir }}/settings.ini"
+      register: bibata_cursor_user_gtk
+
+    - name: Fail if user-specific gtk configuration file exists
+      ansible.builtin.fail:
+        msg: "Please remove user-specific gtk configuration in ~/.config/{{ gtk_major_dir }}/settings.ini"
+      when: bibata_cursor_user_gtk.stat.exists
+
+    - name: Ensure gtk configuration folder exists
+      ansible.builtin.file:
+        path: "/usr/share/{{ gtk_major_dir }}"
+        state: directory
+        mode: "755"
+        owner: root
+        group: root
+
+    - name: Ensure gtk configuration includes cursor name
+      community.general.ini_file:
+        path: "/usr/share/{{ gtk_major_dir }}/settings.ini"
+        section: Settings
+        option: gtk-cursor-theme-name
+        value: Bibata-Modern-{{ bibata_cursor_type }}
+        state: present
+        mode: "644"
+        owner: root
+        group: root
+
+    - name: Ensure gtk configuration includes cursor size
+      community.general.ini_file:
+        path: "/usr/share/{{ gtk_major_dir }}/settings.ini"
+        section: Settings
+        option: gtk-cursor-theme-size
+        value: "{{ bibata_cursor_size }}"

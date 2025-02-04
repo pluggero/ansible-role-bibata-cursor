@@ -1,0 +1,31 @@
+---
+- name: Prepare
+  hosts: all
+
+  vars:
+    ansible_user: root
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Install dependencies for testing (Debian)
+      ansible.builtin.apt:
+        name:
+          - libgtk-3-bin
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Update pacman cache
+      ansible.builtin.pacman:
+        update_cache: yes
+      when: ansible_os_family == 'Archlinux'
+
+    - name: Install dependencies for testing (Archlinux)
+      ansible.builtin.pacman:
+        name:
+          - gtk3
+        state: present
+      when: ansible_os_family == 'Archlinux'

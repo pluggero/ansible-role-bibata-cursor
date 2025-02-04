@@ -1,0 +1,8 @@
+---
+bibata_cursor_version: "2.0.7"
+bibata_cursor_install_method: "source"
+bibata_cursor_force_install: false
+bibata_cursor_install_dir: "/usr/local/share/icons"
+bibata_cursor_tmp_dir: "/tmp"
+bibata_cursor_type: "Ice"
+bibata_cursor_size: "20"

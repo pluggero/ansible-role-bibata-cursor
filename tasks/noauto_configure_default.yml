@@ -1,0 +1,31 @@
+---
+- name: Setup default configuration
+  block:
+    - name: Check if a user-specific default configuration directory exists
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.icons/default/index.theme"
+      register: bibata_cursor_user_default
+
+    - name: Fail if user-specific default configuration directory exists
+      ansible.builtin.fail:
+        msg: "Please first remove user-specific default cursor config in ~/.icons/default"
+      when: bibata_cursor_user_default.stat.exists
+
+    - name: Ensure default folder exists
+      ansible.builtin.file:
+        path: "{{ bibata_cursor_install_dir }}/default"
+        state: directory
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: Ensure default cursor configuration exists
+      community.general.ini_file:
+        path: "{{ bibata_cursor_install_dir }}/default/index.theme"
+        section: Icon Theme
+        option: Inherits
+        value: Bibata-Modern-{{ bibata_cursor_type }}
+        state: present
+        mode: "644"
+        owner: root
+        group: root
