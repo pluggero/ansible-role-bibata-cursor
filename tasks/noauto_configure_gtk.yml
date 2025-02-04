@@ -50,3 +50,7 @@
         section: Settings
         option: gtk-cursor-theme-size
         value: "{{ bibata_cursor_size }}"
+        state: present
+        mode: "644"
+        owner: root
+        group: root

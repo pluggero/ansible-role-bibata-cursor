@@ -19,12 +19,12 @@
       when: ansible_os_family == 'Debian'
 
     - name: Update pacman cache
-      ansible.builtin.pacman:
-        update_cache: yes
+      community.general.pacman:
+        update_cache: true
       when: ansible_os_family == 'Archlinux'
 
     - name: Install dependencies for testing (Archlinux)
-      ansible.builtin.pacman:
+      community.general.pacman:
         name:
           - gtk3
         state: present
