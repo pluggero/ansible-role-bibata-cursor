@@ -10,6 +10,15 @@ None.
 
 ## Role Variables
 
+- **NOTE**: To make sure the cursor is displayed correctly in Qt applications, you have to set environment variables:
+  - `XCURSOR_SIZE` to the size of the cursor
+  - `XCURSOR_THEME` to the name of the cursor theme
+- **NOTE**: Also, the cursor should be defined in the `~/.Xresources` file:
+  ```
+  Xcursor.size: 20
+  Xcursor.theme: Bibata-Modern-Ice
+  ```
+
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
 ```yaml
@@ -35,10 +44,6 @@ bibata_cursor_size: "20"
 
 The size of the cursor can be defined with `bibata_cursor_size`.
 Available options are: 16, 20, 22, 24, 28, 32, 40, 48, 56, 64, 72, 80, 88, 96
-
-- **NOTE**: To make sure the cursor is displayed correctly in Qt applications, you have to set environment variables:
-  - `XCURSOR_SIZE` to the size of the cursor
-  - `XCURSOR_THEME` to the name of the cursor theme
 
 ## Dependencies
 
