@@ -1,6 +1,6 @@
 # Ansible Role: Bibata Cursor
 
-[![CI](https://github.com/pluggero/ansible-role-bibata_cursor/actions/workflows/ci.yml/badge.svg)](https://github.com/pluggero/ansible-role-bibata_cursor/actions/workflows/ci.yml) [![Ansible Galaxy downloads](https://img.shields.io/ansible/role/d/pluggero/bibata_cursor?label=Galaxy%20downloads&logo=ansible&color=%23096598)](https://galaxy.ansible.com/ui/standalone/roles/pluggero/bibata_cursor)
+[![CI](https://github.com/pluggero/ansible-role-bibata-cursor/actions/workflows/ci.yml/badge.svg)](https://github.com/pluggero/ansible-role-bibata-cursor/actions/workflows/ci.yml) [![Ansible Galaxy downloads](https://img.shields.io/ansible/role/d/pluggero/bibata_cursor?label=Galaxy%20downloads&logo=ansible&color=%23096598)](https://galaxy.ansible.com/ui/standalone/roles/pluggero/bibata_cursor)
 
 An Ansible Role that installs a selected bibata cursor type (https://github.com/ful1e5/Bibata_Cursor).
 
