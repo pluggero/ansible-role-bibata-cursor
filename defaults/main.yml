@@ -1,8 +1,14 @@
 ---
 bibata_cursor_version: "2.0.7"
-bibata_cursor_install_method: "source"
+bibata_cursor_install_method: "dynamic"
 bibata_cursor_force_install: false
-bibata_cursor_install_dir: "/usr/local/share/icons"
-bibata_cursor_tmp_dir: "/tmp"
+
+# If installed from source
+bibata_cursor_download_url: "https://github.com/ful1e5/Bibata_Cursor/releases/download/v{{ bibata_cursor_version }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
+bibata_cursor_download_dir: "/tmp"
+bibata_cursor_install_dir: "/usr/share/icons"
+bibata_cursor_install_folder: "Bibata-Modern-{{ bibata_cursor_type }}"
+
+# Cursor type and size
 bibata_cursor_type: "Ice"
 bibata_cursor_size: "20"

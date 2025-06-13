@@ -8,3 +8,7 @@
     - name: Setup gtk configuration
       ansible.builtin.include_tasks:
         file: noauto_configure_gtk.yml
+
+    - name: Setup Xresources for i3 and X11-based environments
+      ansible.builtin.include_tasks:
+        file: noauto_configure_xresources.yml

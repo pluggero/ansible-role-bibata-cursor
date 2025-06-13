@@ -1,0 +1,44 @@
+---
+- name: Checks installed bibata cursor version from source
+  block:
+    - name: Check if installation directory exists
+      ansible.builtin.stat:
+        path: "{{ bibata_cursor_install_dir }}"
+      register: bibata_cursor_install_dir_cmd
+
+    - name: Check if selected bibata cursor is installed
+      ansible.builtin.find:
+        paths: "{{ bibata_cursor_install_dir }}"
+        patterns: "{{ bibata_cursor_install_folder }}"
+        file_type: directory
+      register: bibata_cursor_install_folder_cmd
+      become: true
+
+    - name: Check bibata cursor installation
+      when: bibata_cursor_install_folder_cmd.files | length > 0
+      block:
+        - name: Check for version.txt in installed cursor directory
+          ansible.builtin.stat:
+            path: "{{ bibata_cursor_install_dir }}/{{ bibata_cursor_install_folder }}/version.txt"
+          register: bibata_cursor_version_txt_cmd
+
+        - name: Read version from version.txt
+          ansible.builtin.slurp:
+            path: "{{ bibata_cursor_install_dir }}/{{ bibata_cursor_install_folder }}/version.txt"
+          register: bibata_cursor_version_slurp_cmd
+          when: bibata_cursor_version_txt_cmd.stat.exists
+          become: true
+
+        - name: Set version from version.txt
+          ansible.builtin.set_fact:
+            bibata_cursor_installed_version: "{{ bibata_cursor_version_slurp_cmd.content | b64decode | trim }}"
+          when: bibata_cursor_version_slurp_cmd is defined
+
+        - name: Set bibata cursor installed from source
+          ansible.builtin.set_fact:
+            bibata_cursor_installed_from: "source"
+          when: bibata_cursor_installed_version is defined and bibata_cursor_installed_version != ""
+
+        - name: Debug version from version.txt
+          ansible.builtin.debug:
+            var: bibata_cursor_installed_version

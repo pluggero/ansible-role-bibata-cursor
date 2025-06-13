@@ -1,30 +1,19 @@
 ---
-- name: Ensure bibata cursor are installed
+- name: Ensure bibata cursor is installed
   block:
-    - name: Check if installation directory exists
-      ansible.builtin.stat:
-        path: "{{ bibata_cursor_install_dir }}"
-      register: bibata_cursor_dir
+    - name: Import installed bibata cursor version check
+      ansible.builtin.include_tasks: noauto_check_installed_version.yml
+      when: bibata_cursor_installed_version is not defined
 
-    - name: Check if selected bibata cursor is installed
-      ansible.builtin.find:
-        paths: "{{ bibata_cursor_install_dir }}"
-        patterns: "Bibata-Modern-{{ bibata_cursor_type }}"
-        file_type: directory
-      register: bibata_cursor_selected
-      become: true
-      when:
-        - bibata_cursor_dir.stat.exists
-
-    - name: Force install if no matches were found
+    - name: Force install if the version numbers do not match
       ansible.builtin.set_fact:
         bibata_cursor_force_install: true
       when:
-        - bibata_cursor_selected.matched is defined
-        - bibata_cursor_selected.matched == 0
+        - bibata_cursor_installed_version is defined
+        - bibata_cursor_installed_version != bibata_cursor_version
 
     - name: Install bibata cursor from source
-      when: bibata_cursor_selected.matched is not defined or bibata_cursor_force_install
+      when: bibata_cursor_installed_version is not defined or bibata_cursor_force_install
       block:
         - name: Ensure the installation folder exists
           ansible.builtin.file:
@@ -35,24 +24,29 @@
             group: root
           become: true
 
+        - name: Uninstall current bibata_cursor installation
+          ansible.builtin.include_tasks: noauto_uninstall.yml
+          when: bibata_cursor_installed_version is defined and bibata_cursor_installed_version != ""
+
         - name: Download specific cursor files
           ansible.builtin.get_url:
-            url: "https://github.com/ful1e5/Bibata_Cursor/releases/download/v{{ bibata_cursor_version }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
-            dest: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
+            url: "{{ bibata_cursor_download_url }}"
+            dest: "{{ bibata_cursor_download_dir }}/{{ bibata_cursor_install_folder }}.tar.xz"
             mode: "0755"
             owner: root
             group: root
+          become: true
 
         - name: Extract cursor files
           ansible.builtin.unarchive:
-            src: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
-            dest: "{{ bibata_cursor_tmp_dir }}"
+            src: "{{ bibata_cursor_download_dir }}/{{ bibata_cursor_install_folder }}.tar.xz"
+            dest: "{{ bibata_cursor_download_dir }}"
             remote_src: true
           become: true
 
         - name: Copy folder to cursor folder
           ansible.builtin.copy:
-            src: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}"
+            src: "{{ bibata_cursor_download_dir }}/{{ bibata_cursor_install_folder }}"
             dest: "{{ bibata_cursor_install_dir }}"
             mode: "0755"
             owner: root
@@ -60,13 +54,23 @@
             remote_src: true
           become: true
 
+        - name: Write version file into installed cursor directory
+          ansible.builtin.copy:
+            content: "{{ bibata_cursor_version }}"
+            dest: "{{ bibata_cursor_install_dir }}/{{ bibata_cursor_install_folder }}/version.txt"
+            mode: "0644"
+            owner: root
+            group: root
+          become: true
+
         - name: Remove temporary cursor folder
           ansible.builtin.file:
-            path: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}"
+            path: "{{ bibata_cursor_download_dir }}/{{ bibata_cursor_install_folder }}"
             state: absent
           become: true
 
         - name: Remove cursor archive
           ansible.builtin.file:
-            path: "{{ bibata_cursor_tmp_dir }}/Bibata-Modern-{{ bibata_cursor_type }}.tar.xz"
+            path: "{{ bibata_cursor_download_dir }}/{{ bibata_cursor_install_folder }}.tar.xz"
             state: absent
+          become: true

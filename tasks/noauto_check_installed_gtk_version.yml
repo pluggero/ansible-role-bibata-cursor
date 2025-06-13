@@ -1,0 +1,34 @@
+---
+- name: Check installed gtk version
+  block:
+    - name: Get installed gtk version
+      ansible.builtin.command:
+        cmd: "gtk-launch --version"
+      ignore_errors: true
+      changed_when: false
+      failed_when: false
+      register: bibata_cursor_installed_gtk_version_cmd
+
+    - name: Extract only the version into a variable
+      ansible.builtin.set_fact:
+        bibata_cursor_installed_gtk_version: "{{ bibata_cursor_installed_gtk_version_cmd.stdout | regex_replace('^.*?([\\d\\.]{2,}).*$', '\\1') }}"
+
+    - name: Debug installed gtk version
+      ansible.builtin.debug:
+        var: bibata_cursor_installed_gtk_version
+
+    - name: Extract major version into a variable
+      ansible.builtin.set_fact:
+        bibata_cursor_installed_gtk_major_version: "{{ bibata_cursor_installed_gtk_version.split('.')[0] }}"
+
+    - name: Debug major gtk version
+      ansible.builtin.debug:
+        var: bibata_cursor_installed_gtk_major_version
+
+    - name: Derive the gtk major version directory
+      ansible.builtin.set_fact:
+        bibata_cursor_installed_gtk_major_dir: "gtk-{{ bibata_cursor_installed_gtk_major_version }}.0"
+
+    - name: Debug gtk major directory
+      ansible.builtin.debug:
+        var: bibata_cursor_installed_gtk_major_dir

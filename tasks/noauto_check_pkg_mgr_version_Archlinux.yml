@@ -1,0 +1,29 @@
+---
+- name: Ensure we are using pacman
+  ansible.builtin.fail:
+    msg: "This role only supports {{ ansible_os_family }} systems that use pacman as a package manager."
+  when: ansible_pkg_mgr != "pacman"
+
+- name: Checks bibata_cursor version in package manager
+  when: bibata_cursor_distro_pkgs is defined and bibata_cursor_distro_pkgs | length > 0
+  block:
+    - name: Update pacman cache
+      community.general.pacman:
+        update_cache: true
+      become: true
+
+    - name: Get bibata_cursor version from package manager
+      ansible.builtin.command:
+        cmd: "pacman -Si {{ bibata_cursor_distro_pkgs[0] }}"
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+      register: bibata_cursor_pkg_mgr_version_cmd
+
+    - name: Extract only the version into a variable
+      ansible.builtin.set_fact:
+        bibata_cursor_pkg_mgr_version: "{{ (bibata_cursor_pkg_mgr_version_cmd.stdout | regex_search('Version.*?([\\d\\.]{2,})', '\\1', multiline=True))[0] }}"
+
+    - name: Debug bibata_cursor version from package manager
+      ansible.builtin.debug:
+        var: bibata_cursor_pkg_mgr_version
