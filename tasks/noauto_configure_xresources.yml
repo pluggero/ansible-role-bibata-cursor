@@ -1,0 +1,22 @@
+---
+- name: Ensure .Xresources file contains Xcursor settings
+  block:
+    - name: Add or update Xcursor.theme in .Xresources
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.Xresources"
+        regexp: "^Xcursor.theme:"
+        line: "Xcursor.theme: Bibata-Modern-{{ bibata_cursor_type }}"
+        create: true
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Add or update Xcursor.size in .Xresources
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.Xresources"
+        regexp: "^Xcursor.size:"
+        line: "Xcursor.size: {{ bibata_cursor_size | default(24) }}"
+        create: true
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"

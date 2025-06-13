@@ -1,0 +1,37 @@
+---
+- name: Checks installed bibata cursor version from source
+  block:
+    - name: Check if installation directory exists
+      ansible.builtin.stat:
+        path: "{{ bibata_cursor_install_dir }}"
+      register: bibata_cursor_install_dir_cmd
+
+    - name: Check bibata cursor installation
+      when: bibata_cursor_install_dir_cmd.stat.exists
+      block:
+        - name: Check if selected bibata cursor is installed
+          ansible.builtin.find:
+            paths: "{{ bibata_cursor_install_dir }}"
+            patterns: "{{ bibata_cursor_install_folder }}"
+            file_type: directory
+          register: bibata_cursor_installed_folder_cmd
+          become: true
+
+        - name: Extract version and type from first matching folder
+          ansible.builtin.set_fact:
+            bibata_cursor_installed_version: "{{ bibata_cursor_installed_folder_cmd.files[0].path | basename | regex_replace('^Bibata-Modern-([0-9.]+)-.*$', '\\1') }}"
+            bibata_cursor_installed_type: "{{ bibata_cursor_installed_folder_cmd.files[0].path | basename | regex_replace('^Bibata-Modern-[0-9.]+-(.*)$', '\\1') }}"
+          when: bibata_cursor_installed_folder_cmd.files | length > 0
+
+        - name: Debug bibata_cursor_installed_version from source
+          ansible.builtin.debug:
+            var: bibata_cursor_installed_version
+
+        - name: Debug bibata_cursor_installed_type from source
+          ansible.builtin.debug:
+            var: bibata_cursor_installed_type
+
+        - name: Set bibata cursor installed from source
+          ansible.builtin.set_fact:
+            bibata_cursor_installed_from: "source"
+          when: bibata_cursor_installed_version is defined and bibata_cursor_installed_version != ""

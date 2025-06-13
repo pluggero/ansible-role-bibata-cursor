@@ -1,0 +1,6 @@
+---
+bibata_cursor_dep_pkgs:
+  - libgtk-3-bin
+
+bibata_cursor_distro_pkgs:
+  - bibata-cursor-theme
