@@ -1,0 +1,5 @@
+---
+bibata_cursor_dep_pkgs:
+  - gtk3
+
+bibata_cursor_distro_pkgs: []

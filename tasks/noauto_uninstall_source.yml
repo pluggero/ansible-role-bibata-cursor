@@ -1,0 +1,19 @@
+---
+- name: Uninstall Bibata cursor installed from source
+  block:
+    - name: Find all bibata cursor directories in install path
+      ansible.builtin.find:
+        paths: "{{ bibata_cursor_install_dir }}"
+        patterns: "^Bibata-Modern-.*$"
+        file_type: directory
+        use_regex: true
+      register: bibata_cursor_found_dirs_cmd
+
+    - name: Remove all Bibata cursor directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ bibata_cursor_found_dirs_cmd.files }}"
+      loop_control:
+        label: "{{ item.path }}"
+      become: true

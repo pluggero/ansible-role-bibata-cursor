@@ -1,0 +1,29 @@
+---
+- name: Ensure we are using apt
+  ansible.builtin.fail:
+    msg: "This role only supports {{ ansible_os_family }} systems that use apt as a package manager."
+  when: ansible_pkg_mgr != "apt"
+
+- name: Checks installed bibata cursor version in package manager
+  when: bibata_cursor_distro_pkgs is defined and bibata_cursor_distro_pkgs | length > 0
+  block:
+    - name: Get installed bibata cursor version from package manager
+      ansible.builtin.command:
+        cmd: "dpkg-query -W {{ bibata_cursor_distro_pkgs[0] }}"
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+      register: bibata_cursor_installed_pkg_mgr_version_cmd
+
+    - name: Extract only the version into a variable
+      ansible.builtin.set_fact:
+        bibata_cursor_installed_version: "{{ bibata_cursor_installed_pkg_mgr_version_cmd.stdout | regex_replace('^.*?([\\d\\.]{2,}).*$', '\\1') }}"
+
+    - name: Debug installed bibata_cursor version from package manager
+      ansible.builtin.debug:
+        var: bibata_cursor_installed_version
+
+    - name: Set bibata cursor installed from package manager
+      ansible.builtin.set_fact:
+        bibata_cursor_installed_from: "package manager"
+      when: bibata_cursor_installed_version is defined and bibata_cursor_installed_version != ""
