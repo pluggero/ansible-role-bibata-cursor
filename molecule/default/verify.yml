@@ -1,0 +1,50 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  vars_files:
+    - ../../defaults/main.yml
+
+  tasks:
+    - name: Check installed version
+      ansible.builtin.include_tasks: "../../tasks/noauto_check_installed_version.yml"
+
+    - name: Check installed gtk version
+      ansible.builtin.include_tasks: "../../tasks/noauto_check_installed_gtk_version.yml"
+
+    - name: Assert installed version is correct
+      ansible.builtin.assert:
+        that:
+          - "bibata_cursor_installed_version == bibata_cursor_version"
+
+    - name: Assert default index.theme is configured correctly
+      ansible.builtin.slurp:
+        path: "{{ bibata_cursor_install_dir }}/default/index.theme"
+      register: bibata_cursor_index_theme
+
+    - name: Assert default inherits setting
+      ansible.builtin.assert:
+        that:
+          - "'Inherits = Bibata-Modern-' + bibata_cursor_type in (bibata_cursor_index_theme.content | b64decode)"
+
+    - name: Assert GTK settings.ini is configured correctly
+      ansible.builtin.slurp:
+        path: "/usr/share/{{ bibata_cursor_installed_gtk_major_dir }}/settings.ini"
+      register: bibata_cursor_gtk_settings
+
+    - name: Assert GTK theme and size settings
+      ansible.builtin.assert:
+        that:
+          - "'gtk-cursor-theme-name = Bibata-Modern-' + bibata_cursor_type in (bibata_cursor_gtk_settings.content | b64decode)"
+          - "'gtk-cursor-theme-size = ' + bibata_cursor_size in (bibata_cursor_gtk_settings.content | b64decode)"
+
+    - name: Assert .Xresources is configured correctly
+      ansible.builtin.slurp:
+        path: "{{ ansible_env.HOME }}/.Xresources"
+      register: bibata_cursor_xresources
+
+    - name: Assert Xcursor settings are present in .Xresources
+      ansible.builtin.assert:
+        that:
+          - "'Xcursor.theme: Bibata-Modern-' + bibata_cursor_type in (bibata_cursor_xresources.content | b64decode)"
+          - "'Xcursor.size: ' + bibata_cursor_size in (bibata_cursor_xresources.content | b64decode)"
