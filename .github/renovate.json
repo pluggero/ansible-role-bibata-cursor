@@ -1,0 +1,34 @@
+{
+  "extends": [
+    "config:best-practices",
+    ":disableRateLimiting"
+  ],
+  "enabledManagers": [
+    "github-actions",
+    "pip_requirements",
+    "custom.regex",
+    "ansible-galaxy"
+  ],
+  "ansible-galaxy": {
+    "managerFilePatterns": [
+      "/^requirements\\.ya?ml$/"
+    ]
+  },
+  "assignees": [
+    "pluggero"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^defaults/main\\.yml$/"
+      ],
+      "matchStrings": [
+        "bibata_cursor_version:\\s+\"(?<currentValue>[\\d\\.]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "ful1e5/Bibata_Cursor",
+      "versioningTemplate": "semver"
+    }
+  ]
+}
