@@ -14,6 +14,12 @@
     {
       "matchManagers": ["custom.regex", "ansible-galaxy"],
       "automerge": false
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchDepNames": ["python/cpython"],
+      "automerge": true,
+      "automergeType": "pr"
     }
   ],
   "enabledManagers": [
@@ -41,6 +47,18 @@
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "ful1e5/Bibata_Cursor",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "\\.github/workflows/.+\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "python-version:\\s+[\"'](?<currentValue>\\d+\\.\\d+)[\"']"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "python/cpython",
       "versioningTemplate": "semver"
     }
   ]
