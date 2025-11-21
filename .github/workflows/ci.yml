@@ -2,11 +2,12 @@
 name: CI
 "on":
   pull_request:
-  push:
-    branches:
-      - main
   schedule:
     - cron: "0 7 * * 5"
+
+concurrency:
+  group: ansible-roles-ci
+  cancel-in-progress: false
 
 defaults:
   run:
